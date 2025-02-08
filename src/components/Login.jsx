@@ -15,7 +15,7 @@ const Login = () => {
     try {
       const res = await axiosInstance.post(
         "user/login",
-        { email, password, role: "Admin" }, // Removed trailing space
+        { email, password, role: "Doctor" }, // Removed trailing space
         {
           withCredentials: true,
           headers: { "Content-Type": "application/json" },
@@ -43,7 +43,7 @@ const Login = () => {
     <section className="container form-component">
       <img src="/logo.png" alt="logo" className="logo" />
       <h1 className="form-title">WELCOME TO AADICARE</h1>
-      <p>Only Admins Are Allowed To Access These Resources!</p>
+      <p>Only Doctors Are Allowed To Access These Resources!</p>
       <form onSubmit={handleLogin}>
         <input
           type="text"

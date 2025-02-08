@@ -11,6 +11,9 @@ const Dashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [totalAppointments, setTotalAppointments] = useState(0);
   const [doctors, setDoctors] = useState([]);
+  const [user, setUser] = useState(null); // Store admin or doctor details
+
+  const { isAuthenticated} = useContext(Context);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -37,8 +40,27 @@ const Dashboard = () => {
       }
     };
 
+    const fetchUserDetails = async () => {
+      try {
+        const { data } = await axiosInstance.get("/user/admin/me", {
+          withCredentials: true,
+        });
+        setUser(data.user);
+      } catch (error) {
+        try {
+          const { data } = await axiosInstance.get("/user/doctor/me", {
+            withCredentials: true,
+          });
+          setUser(data.user);
+        } catch (error) {
+          setUser(null);
+        }
+      }
+    };
+
     fetchAppointments();
     fetchDoctors();
+    fetchUserDetails();
   }, []);
 
   const handleUpdateStatus = async (appointmentId, status) => {
@@ -77,7 +99,6 @@ const Dashboard = () => {
     }
   };
 
-  const { isAuthenticated, admin } = useContext(Context);
   if (!isAuthenticated) {
     return <Navigate to={"/login"} />;
   }
@@ -89,15 +110,15 @@ const Dashboard = () => {
           <img src="/doc.png" alt="docImg" />
           <div className="content">
             <div>
-              <p>Hello,</p>
+              <p>Hello,Dr.</p>
               <h5>
-                {admin && `${admin.firstName} ${admin.lastName}`.toUpperCase()}
+                {user ? `${user.firstName} ${user.lastName}`.toUpperCase() : "User"}
               </h5>
             </div>
             <p>
-              Welcome To Aadicare Admin Dashboard. Here You Can Change Status Of Appointment,
-              Add New Doctors, Add New Patients, Add New Admins, Also Can Check Messages
-              Inquiries From Different Users Of Website.
+              Welcome To Aadicare {user?.role === "Doctor" ? "Doctor" : "Admin"} Dashboard.
+              Here You Can See Your Patients Appointments ,Change Status Of Appointment, Add New Doctors, Add New Patients,
+             Also Can Check Messages Inquiries From Different Users Of Website.
             </p>
           </div>
         </div>
@@ -132,8 +153,8 @@ const Dashboard = () => {
                   <td>{`${appointment.firstName.toUpperCase()} ${appointment.lastName.toUpperCase()}`}</td>
                   <td>{new Date(appointment.appointment_date).toLocaleDateString()}</td>
                   <td>{appointment.timeSlot}</td>
-                  <td>{`${appointment.doctor.firstName} ${appointment.doctor.lastName}`}</td>
                   <td>{appointment.department}</td>
+                  <td>{`${appointment.doctor?.firstName} ${appointment.doctor?.lastName}`}</td>
                   <td>
                     <select
                       className={
