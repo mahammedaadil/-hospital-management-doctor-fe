@@ -18,7 +18,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const { data } = await axiosInstance.get("/appointment/getall", {
+        const { data } = await axiosInstance.get("/appointment/doctor", {
           withCredentials: true,
         });
         setAppointments(data.appointments);
@@ -28,6 +28,7 @@ const Dashboard = () => {
         setTotalAppointments(0);
       }
     };
+    
 
     const fetchDoctors = async () => {
       try {
