@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Context } from "../main";
-import axiosInstance from "../axios"; // Ensure this path is correct
+import axiosInstance from "../axios"; 
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +15,7 @@ const Login = () => {
     try {
       const res = await axiosInstance.post(
         "user/login",
-        { email, password, role: "Doctor" }, // Removed trailing space
+        { email, password, role: "Doctor" }, 
         {
           withCredentials: true,
           headers: { "Content-Type": "application/json" },
@@ -26,7 +26,7 @@ const Login = () => {
       setIsAuthenticated(true);
       localStorage.setItem("token", res.data.token);
       navigateTo("/");
-      // Clear the input fields after successful login
+
       setEmail("");
       setPassword("");
     } catch (error) {
@@ -50,14 +50,14 @@ const Login = () => {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required // Optional: make the field required
+          required 
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required // Optional: make the field required
+          required 
         />
         <div style={{ justifyContent: "center", alignItems: "center" }}>
           <button type="submit">Login</button>
