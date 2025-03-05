@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../main";
 import { Navigate } from "react-router-dom";
-import axiosInstance from "../axios"; // Ensure correct import path
+import axiosInstance from "../axios";
 import { toast } from "react-toastify";
 import { GoCheckCircleFill } from "react-icons/go";
 import { AiFillCloseCircle } from "react-icons/ai";
@@ -9,11 +9,14 @@ import { FaTrash } from "react-icons/fa";
 
 const Dashboard = () => {
   const [appointments, setAppointments] = useState([]);
+  const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [totalAppointments, setTotalAppointments] = useState(0);
   const [doctors, setDoctors] = useState([]);
-  const [user, setUser] = useState(null); // Store admin or doctor details
+  const [user, setUser] = useState(null);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const { isAuthenticated} = useContext(Context);
+  const { isAuthenticated } = useContext(Context);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -23,12 +26,13 @@ const Dashboard = () => {
         });
         setAppointments(data.appointments);
         setTotalAppointments(data.appointments.length);
+        setFilteredAppointments(data.appointments);
       } catch (error) {
         setAppointments([]);
         setTotalAppointments(0);
+        setFilteredAppointments([]);
       }
     };
-    
 
     const fetchDoctors = async () => {
       try {
@@ -84,6 +88,26 @@ const Dashboard = () => {
     }
   };
 
+  const handleUpdatePresent = async (appointmentId, present) => {
+    try {
+      const { data } = await axiosInstance.put(
+        `/appointment/update/${appointmentId}`,
+        { present },
+        { withCredentials: true }
+      );
+      setAppointments((prevAppointments) =>
+        prevAppointments.map((appointment) =>
+          appointment._id === appointmentId
+            ? { ...appointment, present }
+            : appointment
+        )
+      );
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update present status");
+    }
+  };
+
   const handleDeleteAppointment = async (appointmentId) => {
     try {
       const { data } = await axiosInstance.delete(
@@ -100,6 +124,25 @@ const Dashboard = () => {
     }
   };
 
+  const handleDateFilterChange = (event) => {
+    setSelectedDate(event.target.value);
+    const filtered = appointments.filter((appointment) =>
+      new Date(appointment.appointment_date).toLocaleDateString() ===
+      new Date(event.target.value).toLocaleDateString()
+    );
+    setFilteredAppointments(filtered);
+  };
+
+  const handleSearch = (event) => {
+    const filtered = appointments.filter((appointment) =>
+      `${appointment.firstName} ${appointment.lastName}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
+    setFilteredAppointments(filtered);
+    setSearchTerm(event.target.value);
+  };
+
   if (!isAuthenticated) {
     return <Navigate to={"/login"} />;
   }
@@ -111,15 +154,15 @@ const Dashboard = () => {
           <img src="/doc.png" alt="docImg" />
           <div className="content">
             <div>
-              <p>Hello,Dr.</p>
+              <p>Hello, Dr.</p>
               <h5>
                 {user ? `${user.firstName} ${user.lastName}`.toUpperCase() : "User"}
               </h5>
             </div>
             <p>
               Welcome To Aadicare {user?.role === "Doctor" ? "Doctor" : "Admin"} Dashboard.
-              Here You Can See Your Patients Appointments ,Change Status Of Appointment, Add New Doctors, Add New Patients,
-             Also Can Check Messages Inquiries From Different Users Of Website.
+              Here You Can See Your Patients Appointments, Change Status Of Appointment, Add New Doctors, Add New Patients,
+              Also Can Check Messages Inquiries From Different Users Of Website.
             </p>
           </div>
         </div>
@@ -132,8 +175,36 @@ const Dashboard = () => {
           <h3>{doctors.length}</h3>
         </div>
       </div>
+
+      {/* Filters Row */}
+      <div className="filters-row">
+        {/* Search Bar */}
+        <div className="filter search-bar">
+          <label htmlFor="searchPatients">Search Patient: </label>
+          <input
+            type="text"
+            id="searchPatients"
+            placeholder="Search by name"
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+        </div>
+
+        {/* Date Filter */}
+        <div className="filter">
+          <label htmlFor="dateSelect">Filter by Date: </label>
+          <input
+            type="date"
+            id="dateSelect"
+            value={selectedDate}
+            onChange={handleDateFilterChange}
+          />
+        </div>
+      </div>
+
       <div className="banner">
         <h5>Appointments</h5>
+
         <table>
           <thead>
             <tr>
@@ -144,12 +215,13 @@ const Dashboard = () => {
               <th>Doctor</th>
               <th>Status</th>
               <th>Visited</th>
+              <th>Present</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {appointments.length > 0 ? (
-              appointments.map((appointment) => (
+            {filteredAppointments.length > 0 ? (
+              filteredAppointments.map((appointment) => (
                 <tr key={appointment._id}>
                   <td>{`${appointment.firstName.toUpperCase()} ${appointment.lastName.toUpperCase()}`}</td>
                   <td>{new Date(appointment.appointment_date).toLocaleDateString()}</td>
@@ -189,6 +261,17 @@ const Dashboard = () => {
                     )}
                   </td>
                   <td>
+                    <select
+                      value={appointment.present}
+                      onChange={(e) =>
+                        handleUpdatePresent(appointment._id, e.target.value)
+                      }
+                    >
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </td>
+                  <td>
                     <FaTrash
                       className="delete-icon"
                       onClick={() => handleDeleteAppointment(appointment._id)}
@@ -199,7 +282,7 @@ const Dashboard = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="8">No Appointments Found!</td>
+                <td colSpan="9">No Appointments Found!</td>
               </tr>
             )}
           </tbody>

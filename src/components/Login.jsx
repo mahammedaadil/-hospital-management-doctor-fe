@@ -2,11 +2,13 @@ import React, { useContext, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Context } from "../main";
-import axiosInstance from "../axios"; 
+import axiosInstance from "../axios";
+import ForgotPassword from "./ForgotPassword"; 
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { isAuthenticated, setIsAuthenticated } = useContext(Context);
   const navigateTo = useNavigate();
 
@@ -59,10 +61,22 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required 
         />
-        <div style={{ justifyContent: "center", alignItems: "center" }}>
+        
+        <div className="button-container">
           <button type="submit">Login</button>
+          <button
+            type="button"
+            className="forgot-password-btn"
+            onClick={() => setShowForgotPassword(true)}
+          >
+            Forgot Password?
+          </button>
         </div>
       </form>
+
+      {showForgotPassword && (
+        <ForgotPassword onClose={() => setShowForgotPassword(false)} />
+      )}
     </section>
   );
 };

@@ -20,6 +20,7 @@ const Doctors = () => {
     doctorFees: "",
     joiningDate: "",
     resignationDate: "",
+    doctorAvailability: [],
   });
 
   useEffect(() => {
@@ -28,7 +29,6 @@ const Doctors = () => {
         const { data } = await axiosInstance.get("/user/doctors");
         setDoctors(data.doctors);
       } catch (error) {
-        console.error("Error fetching doctors:", error);
         toast.error(error.response?.data?.message || "Error fetching doctors");
       }
     };
@@ -52,6 +52,7 @@ const Doctors = () => {
       dob: doctor.dob ? doctor.dob.substring(0, 10) : "",
       joiningDate: doctor.joiningDate ? doctor.joiningDate.substring(0, 10) : "",
       resignationDate: doctor.resignationDate ? doctor.resignationDate.substring(0, 10) : "",
+      doctorAvailability: doctor.doctorAvailability || [],
     });
   };
 
@@ -60,7 +61,7 @@ const Doctors = () => {
     try {
       const response = await axiosInstance.put(
         `/user/doctor/update/${editingDoctorId}`,
-        updatedDoctorData
+        { ...updatedDoctorData, doctorAvailability: JSON.stringify(updatedDoctorData.doctorAvailability) }
       );
 
       if (response.data.success) {
@@ -84,12 +85,34 @@ const Doctors = () => {
     setUpdatedDoctorData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const filteredDoctors = filterDepartment === "All" 
-    ? doctors 
-    : doctors.filter(doc => doc.doctorDepartment === filterDepartment);
+  const handleAvailabilityChange = (index, field, value) => {
+    const newAvailability = [...updatedDoctorData.doctorAvailability];
+    newAvailability[index][field] = value;
+    setUpdatedDoctorData((prevData) => ({ ...prevData, doctorAvailability: newAvailability }));
+  };
+
+  const addAvailabilitySlot = () => {
+    setUpdatedDoctorData((prevData) => ({
+      ...prevData,
+      doctorAvailability: [...prevData.doctorAvailability, { day: "", timings: "", date: "" }],
+    }));
+  };
+
+  const removeAvailabilitySlot = (index) => {
+    const newAvailability = updatedDoctorData.doctorAvailability.filter((_, i) => i !== index);
+    setUpdatedDoctorData((prevData) => ({ ...prevData, doctorAvailability: newAvailability }));
+  };
+
+  const isTimeSlotConflicting = (day, timings) => {
+    return updatedDoctorData.doctorAvailability.some(slot => slot.day === day && slot.timings === timings);
+  };
+
+  const filteredDoctors = filterDepartment === "All"
+    ? doctors
+    : doctors.filter((doc) => doc.doctorDepartment === filterDepartment);
 
   if (!isAuthenticated) {
-    return <Navigate to={"/login"} />;
+    return <Navigate to="/login" />;
   }
 
   return (
@@ -103,7 +126,7 @@ const Doctors = () => {
           onChange={(e) => setFilterDepartment(e.target.value)}
         >
           <option value="All">All Departments</option>
-          {Array.from(new Set(doctors.map(doc => doc.doctorDepartment))).map((dept, idx) => (
+          {Array.from(new Set(doctors.map((doc) => doc.doctorDepartment))).map((dept, idx) => (
             <option key={idx} value={dept}>{dept}</option>
           ))}
         </select>
@@ -132,9 +155,7 @@ const Doctors = () => {
                 {element.doctorAvailability && element.doctorAvailability.length > 0 ? (
                   <ul>
                     {element.doctorAvailability.map((slot, index) => (
-                      <li key={index}>
-                        {slot.day}: {slot.timings}
-                      </li>
+                      <li key={index}>{slot.day}: {slot.timings}</li>
                     ))}
                   </ul>
                 ) : (
@@ -155,9 +176,7 @@ const Doctors = () => {
       {editingDoctorId && (
         <div className="modal">
           <div className="modal-content">
-            <span className="close-modal" onClick={() => setEditingDoctorId(null)}>
-              &times;
-            </span>
+            <span className="close-modal" onClick={() => setEditingDoctorId(null)}>&times;</span>
             <h2>Update Doctor</h2>
             <form onSubmit={handleUpdateDoctor}>
               <input type="text" name="firstName" placeholder="First Name" value={updatedDoctorData.firstName} onChange={handleInputChange} required />
@@ -177,8 +196,47 @@ const Doctors = () => {
                 ))}
               </select>
               <input type="number" name="doctorFees" placeholder="Fees" value={updatedDoctorData.doctorFees} onChange={handleInputChange} required />
+              <h4>Joining Date</h4>
               <input type="date" name="joiningDate" value={updatedDoctorData.joiningDate} onChange={handleInputChange} required />
+              <h4>Resignation Date(optional) </h4>
               <input type="date" name="resignationDate" value={updatedDoctorData.resignationDate || ""} onChange={handleInputChange} />
+
+              <h4>Availability</h4>
+              {updatedDoctorData.doctorAvailability.map((slot, index) => (
+                <div key={index} className="availability-slot">
+                  <select
+                    value={slot.day}
+                    onChange={(e) => handleAvailabilityChange(index, "day", e.target.value)}
+                    required
+                  >
+                    <option value="">Select Day</option>
+                    {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
+                      <option key={day} value={day}>{day}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={slot.timings}
+                    onChange={(e) => handleAvailabilityChange(index, "timings", e.target.value)}
+                    required
+                  >
+                    <option value="">Select Time Slot</option>
+                    {["09:00-09:30", "09:30-10:00", "10:00-10:30", "10:30-11:00", "11:00-11:30", "11:30-12:00", "12:00-12:30", "12:30-01:00", "14:00-14:30", "14:30-15:00", "15:00-15:30", "15:30-16:00", "16:00-16:30", "16:30-17:00", "17:00-17:30", "17:30-18:00", "18:00-18:30", "18:30-19:00", "19:00-19:30", "19:30-20:00"].map((time) => (
+                      <option key={time} value={time}>{time}</option>
+                    ))}
+                  </select>
+
+                  
+                <button type="button" className="remove-availability-btn" onClick={() => removeAvailabilitySlot(index)}>
+                Remove
+                </button>
+                  
+                </div>
+              ))}
+              <button type="button" className="add-availability-btn" onClick={addAvailabilitySlot}>
+               Add Availability Slot
+              </button>
+
               <button type="submit" className="update-button">Update Doctor</button>
               <button type="button" className="cancel-button" onClick={() => setEditingDoctorId(null)}>Cancel</button>
             </form>

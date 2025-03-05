@@ -7,7 +7,7 @@
   font-family: "Montserrat", sans-serif;
 }
 body {
-  background:red;
+  background:#d32c46;
 }
 .container {
   padding: 0 100px;
@@ -170,7 +170,7 @@ body {
   display: flex;
   align-items: center;
   border-radius: 20px;
-  background: #b5b5ff;
+  background:#d32c46;
   padding: 20px 20px 0 10px;
 }
 .dashboard .banner:first-child .firstBox img {
@@ -191,18 +191,18 @@ body {
   font-size: 34px;
 }
 .dashboard .banner:first-child .firstBox .content div h5 {
-  color: #ff008d;
+  color:black;
 }
 .dashboard .banner:first-child .firstBox .content p {
   font-size: 16px;
 }
 .dashboard .banner:first-child .secondBox {
-  background: #3939d9f2;
+  background: #2BD4CC;
   color: #fff;
 }
 .dashboard .banner:first-child .thirdBox {
-  color: #ff008d;
-  background: #fff;
+  color: white;
+  background:#d32c46;
 }
 .dashboard .banner:first-child .secondBox,
 .dashboard .banner:first-child .thirdBox {
@@ -213,11 +213,13 @@ body {
   flex-direction: column;
   justify-content: center;
   gap: 12px;
+ 
 }
 .dashboard .banner:first-child .secondBox p,
 .dashboard .banner:first-child .thirdBox p {
   font-size: 24px;
   font-weight: 600;
+  
 }
 .dashboard .banner:first-child .secondBox h3,
 .dashboard .banner:first-child .thirdBox h3 {
@@ -338,6 +340,43 @@ body {
     justify-content: center;
   }
 }
+
+.filters-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+}
+
+.filter label {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.filter select, .filter input {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  cursor: pointer;
+  width: 200px;
+}
+
+.filter.search-bar {
+  display: flex;
+  align-items: center;
+}
+
+.filter.search-bar input {
+  padding: 8px;
+  font-size: 14px;
+  width: 250px; /* Adjust width as needed */
+}
+
 
 .sidebar {
   position: fixed;
@@ -836,3 +875,131 @@ input[type="time"]:before {
     width: 100%;
   }
 }
+
+.availability-slot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.availability-slot select,
+.availability-slot input[type="date"] {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-availability-btn,
+.remove-availability-btn {
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+
+.add-availability-btn {
+  background: linear-gradient(135deg, black, rgb(49, 49, 49));
+  color: #e5e5e5;
+}
+
+.add-availability-btn:hover {
+  background-color: #444;
+}
+
+.remove-availability-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.remove-availability-btn:hover {
+  background-color: #c82333;
+}
+
+.conflict-warning {
+  color: #dc3545;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+
+/*forgot password css */
+/* ForgotPassword.css */
+.forgot-password-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.forgot-password-container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 350px;
+  text-align: center;
+  position: relative;
+}
+
+.forgot-password-container h2 {
+  margin-bottom: 15px;
+}
+
+.forgot-password-container p {
+  font-size: 14px;
+  color: #555;
+}
+
+.forgot-password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.forgot-password-form input {
+  padding: 1px;
+  width: 55%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.forgot-password-form button {
+  background: #271776ca;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.forgot-password-form button:hover {
+  background: #1f1450;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
