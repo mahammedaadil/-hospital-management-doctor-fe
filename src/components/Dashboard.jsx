@@ -5,7 +5,7 @@ import axiosInstance from "../axios";
 import { toast } from "react-toastify";
 import { GoCheckCircleFill } from "react-icons/go";
 import { AiFillCloseCircle } from "react-icons/ai";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaRegCalendarAlt } from "react-icons/fa"; // Add the reschedule icon
 
 const Dashboard = () => {
   const [appointments, setAppointments] = useState([]);
@@ -15,6 +15,10 @@ const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
+  const [selectedAppointment, setSelectedAppointment] = useState(null); // Store selected appointment for rescheduling
+  const [newDate, setNewDate] = useState(""); // Store new date
+  const [newTimeSlot, setNewTimeSlot] = useState(""); // Store new time slot
 
   const { isAuthenticated } = useContext(Context);
 
@@ -142,6 +146,41 @@ const Dashboard = () => {
     setFilteredAppointments(filtered);
     setSearchTerm(event.target.value);
   };
+
+  const openRescheduleModal = (appointment) => {
+    setSelectedAppointment(appointment);
+    setNewDate(appointment.appointment_date);
+    setNewTimeSlot(appointment.timeSlot);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedAppointment(null);
+  };
+
+  const handleReschedule = async () => {
+    console.log('Reschedule Details:', selectedAppointment._id, newDate, newTimeSlot); // Log values to check
+    try {
+      const { data } = await axiosInstance.put(
+        `/appointment/reschedule/${selectedAppointment._id}`,
+        { appointment_date: newDate, timeSlot: newTimeSlot },
+        { withCredentials: true }
+      );
+      setAppointments((prevAppointments) =>
+        prevAppointments.map((appointment) =>
+          appointment._id === selectedAppointment._id
+            ? { ...appointment, appointment_date: newDate, timeSlot: newTimeSlot }
+            : appointment
+        )
+      );
+      toast.success(data.message);
+      closeModal();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to reschedule appointment");
+    }
+  };
+  
 
   if (!isAuthenticated) {
     return <Navigate to={"/login"} />;
@@ -277,6 +316,11 @@ const Dashboard = () => {
                       onClick={() => handleDeleteAppointment(appointment._id)}
                       style={{ cursor: "pointer", color: "red" }}
                     />
+                    <FaRegCalendarAlt
+                      className="reschedule-icon"
+                      onClick={() => openRescheduleModal(appointment)}
+                      style={{ cursor: "pointer", color: "blue", marginLeft: "10px" }}
+                    />
                   </td>
                 </tr>
               ))
@@ -288,6 +332,40 @@ const Dashboard = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Reschedule Modal */}
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h4>Reschedule Appointment</h4>
+            <label htmlFor="newDate">Select New Date:</label>
+            <input
+              type="date"
+              id="newDate"
+              value={newDate}
+              onChange={(e) => setNewDate(e.target.value)}
+            />
+            <label htmlFor="newTimeSlot">Select New Time Slot:</label>
+            <select
+              id="newTimeSlot"
+              value={newTimeSlot}
+              onChange={(e) => setNewTimeSlot(e.target.value)}
+            >
+              <option value="09:00-09:30">09:00-09:30</option>
+              <option value="09:30-10:00">09:30-10:00</option>
+              <option value="10:00-10:30">10:00-10:30</option>
+              <option value="10:30-11:00">10:30-11:00</option>
+              <option value="11:00-11:30">11:00-11:30</option>
+              <option value="11:30-12:00">11:30-12:00</option>
+              {/* Add other time slots as required */}
+            </select>
+            <div className="modal-actions">
+              <button onClick={handleReschedule}>Reschedule</button>
+              <button onClick={closeModal}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
