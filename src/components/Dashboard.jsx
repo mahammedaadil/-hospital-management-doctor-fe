@@ -79,6 +79,8 @@ const Dashboard = () => {
         { status },
         { withCredentials: true }
       );
+      
+      // Update state to reflect changes immediately
       setAppointments((prevAppointments) =>
         prevAppointments.map((appointment) =>
           appointment._id === appointmentId
@@ -86,11 +88,21 @@ const Dashboard = () => {
             : appointment
         )
       );
+  
+      setFilteredAppointments((prevAppointments) =>
+        prevAppointments.map((appointment) =>
+          appointment._id === appointmentId
+            ? { ...appointment, status }
+            : appointment
+        )
+      );
+  
       toast.success(data.message);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update status");
     }
   };
+  
 
   const handleUpdatePresent = async (appointmentId, present) => {
     try {
@@ -99,6 +111,8 @@ const Dashboard = () => {
         { present },
         { withCredentials: true }
       );
+      
+      // Ensure UI updates immediately
       setAppointments((prevAppointments) =>
         prevAppointments.map((appointment) =>
           appointment._id === appointmentId
@@ -106,27 +120,44 @@ const Dashboard = () => {
             : appointment
         )
       );
+  
+      setFilteredAppointments((prevAppointments) =>
+        prevAppointments.map((appointment) =>
+          appointment._id === appointmentId
+            ? { ...appointment, present }
+            : appointment
+        )
+      );
+  
       toast.success(data.message);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update present status");
     }
   };
-
+  
   const handleDeleteAppointment = async (appointmentId) => {
     try {
       const { data } = await axiosInstance.delete(
         `/appointment/delete/${appointmentId}`,
         { withCredentials: true }
       );
+  
+      // Update state to reflect changes instantly
       setAppointments((prevAppointments) =>
         prevAppointments.filter((appointment) => appointment._id !== appointmentId)
       );
+  
+      setFilteredAppointments((prevAppointments) =>
+        prevAppointments.filter((appointment) => appointment._id !== appointmentId)
+      );
+  
       setTotalAppointments((prevTotal) => prevTotal - 1);
       toast.success(data.message);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete appointment");
     }
   };
+  
 
   const handleDateFilterChange = (event) => {
     setSelectedDate(event.target.value);
@@ -160,13 +191,14 @@ const Dashboard = () => {
   };
 
   const handleReschedule = async () => {
-    console.log('Reschedule Details:', selectedAppointment._id, newDate, newTimeSlot); // Log values to check
     try {
       const { data } = await axiosInstance.put(
         `/appointment/reschedule/${selectedAppointment._id}`,
         { appointment_date: newDate, timeSlot: newTimeSlot },
         { withCredentials: true }
       );
+  
+      // Update UI instantly
       setAppointments((prevAppointments) =>
         prevAppointments.map((appointment) =>
           appointment._id === selectedAppointment._id
@@ -174,6 +206,15 @@ const Dashboard = () => {
             : appointment
         )
       );
+  
+      setFilteredAppointments((prevAppointments) =>
+        prevAppointments.map((appointment) =>
+          appointment._id === selectedAppointment._id
+            ? { ...appointment, appointment_date: newDate, timeSlot: newTimeSlot }
+            : appointment
+        )
+      );
+  
       toast.success(data.message);
       closeModal();
     } catch (error) {
@@ -351,13 +392,27 @@ const Dashboard = () => {
               value={newTimeSlot}
               onChange={(e) => setNewTimeSlot(e.target.value)}
             >
-              <option value="09:00-09:30">09:00-09:30</option>
-              <option value="09:30-10:00">09:30-10:00</option>
-              <option value="10:00-10:30">10:00-10:30</option>
-              <option value="10:30-11:00">10:30-11:00</option>
-              <option value="11:00-11:30">11:00-11:30</option>
-              <option value="11:30-12:00">11:30-12:00</option>
-              {/* Add other time slots as required */}
+              
+                <option value="09:30-10:00">09:30-10:00</option>
+                <option value="10:00-10:30">10:00-10:30</option>
+                <option value="10:30-11:00">10:30-11:00</option>
+                <option value="11:00-11:30">11:00-11:30</option>
+                <option value="11:30-12:00">11:30-12:00</option>
+                <option value="12:00-12:30">12:00-12:30</option>
+                <option value="12:30-01:00">12:30-01:00</option>
+                <option value="14:00-14:30">14:00-14:30</option>
+                <option value="14:30-15:00">14:30-15:00</option>
+                <option value="15:00-15:30">15:00-15:30</option>
+                <option value="15:30-16:00">15:30-16:00</option>
+                <option value="16:00-16:30">16:00-16:30</option>
+                <option value="16:30-17:00">16:30-17:00</option>
+                <option value="17:00-17:30">17:00-17:30</option>
+                <option value="17:30-18:00">17:30-18:00</option>
+                <option value="18:00-18:30">18:00-18:30</option>
+                <option value="18:30-19:00">18:30-19:00</option>
+                <option value="19:00-19:30">19:00-19:30</option>
+                <option value="19:30-20:00">19:30-20:00</option>
+           
             </select>
             <div className="modal-actions">
               <button onClick={handleReschedule}>Reschedule</button>
