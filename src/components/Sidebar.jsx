@@ -5,9 +5,12 @@ import { AiFillMessage } from "react-icons/ai";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaUserDoctor } from "react-icons/fa6";
 import { IoPersonAddSharp } from "react-icons/io5";
+import { HiDocumentReport } from "react-icons/hi"; // Reports Icon
+import { FaDatabase } from "react-icons/fa"; // Backup Icon
 import { toast } from "react-toastify";
 import { Context } from "../main";
 import { useNavigate } from "react-router-dom";
+
 
 const Sidebar = () => {
   const [show, setShow] = useState(false);
@@ -18,7 +21,7 @@ const Sidebar = () => {
     localStorage.clear();
     setIsAuthenticated(false);
     navigateTo("/login"); // Fixed function call
-    toast.success("Admin Logged Out Successfully");
+    toast.success("Doctor Logged Out Successfully");
   };
 
   return (
@@ -32,6 +35,8 @@ const Sidebar = () => {
           <FaUserDoctor onClick={() => navigateTo("/doctors")} />
           <IoPersonAddSharp onClick={() => navigateTo("/doctor/addnew")} />
           <AiFillMessage onClick={() => navigateTo("/messages")} />
+          <HiDocumentReport onClick={() => navigateTo("/reports")} /> {/* Reports Icon */}
+          <FaDatabase onClick={() => navigateTo("/backup")} /> {/* Backup Icon */}
           <RiLogoutBoxFill onClick={handleLogout} />
         </div>
       </nav>

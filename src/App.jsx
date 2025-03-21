@@ -10,6 +10,8 @@ import { Context } from "./main";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "./components/Sidebar";
+import Reports from "./components/Reports";
+import Backup from "./components/Backup";
 import "./App.css";
 
 const ProtectedRoute = ({ element, allowedRoles }) => {
@@ -66,6 +68,8 @@ const App = () => {
         <Route path="/doctor/addnew" element={<ProtectedRoute element={<AddNewDoctor />} allowedRoles={["Doctor","Admin",]} />} />
         <Route path="/messages" element={<ProtectedRoute element={<Messages />} allowedRoles={["Admin","Doctor"]} />} />
         <Route path="/doctors" element={<ProtectedRoute element={<Doctors />} allowedRoles={["Doctor", "Admin"]} />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/backup" element={<Backup />} />
       </Routes>
       <ToastContainer position="top-center" />
     </Router>

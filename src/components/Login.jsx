@@ -16,7 +16,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await axiosInstance.post(
-        "user/login",
+        "user/loginadmin",
         { email, password, role: "Doctor" }, 
         {
           withCredentials: true,

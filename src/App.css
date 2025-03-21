@@ -399,7 +399,7 @@ body {
 }
 .sidebar svg:hover {
   background: #fff;
-  color: #3939d9f2;
+  color: #d32c46;
   border-radius: 8px;
   transition: 0.3s;
   cursor: pointer;
@@ -418,7 +418,7 @@ body {
 
 @media (max-width: 1208px) {
   .sidebar {
-    background: #3939d9f2;
+    background:#d32c46;
     left: -100%;
     transition: 0.3s;
   }
@@ -432,7 +432,7 @@ body {
     top: 30px;
     left: 40px;
     font-size: 34px;
-    background: #3939d9f2;
+    background: #d32c46;
     color: #fff;
     height: 40px;
     width: 40px;
@@ -455,7 +455,7 @@ body {
 }
 
 .doctors h1 {
-  color: #3939d9f2;
+  color: #d32c46;
   margin-bottom: 30px;
   font-size: 2.3rem;
 }
@@ -506,7 +506,7 @@ body {
 }
 
 .messages h1 {
-  color: #3939d9f2;
+  color: #d32c46;
   margin-bottom: 30px;
   font-size: 2.3rem;
 }
@@ -1098,5 +1098,221 @@ input[type="time"]:before {
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* Reports Component CSS */
+
+.reports-container {
+  padding: 40px;
+  background: #e5e5e5;
+  border-top-left-radius: 50px;
+  border-bottom-left-radius: 50px;
+  margin-left: 120px; /* Ensure it doesn't overlap with the sidebar */
+  min-height: calc(112.5vh - 80px); /* Minimum height to fill the viewport */
+  overflow-y: auto; /* Add scroll if content overflows */
+}
+
+.reports-container h2 {
+  font-size: 2.3rem;
+  color: #d32c46;
+  margin-bottom: 30px;
+}
+
+.reports-container table {
+  width: 100%;
+  color: #111;
+  font-size: 20px;
+  border-collapse: collapse;
+}
+
+.reports-container table thead {
+  background-color: #d32c46;
+  color: #fff;
+}
+
+.reports-container table thead th {
+  padding: 12px;
+  text-align: left;
+}
+
+.reports-container table tbody td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.reports-container table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.reports-container table tbody td a {
+  color: #ff008d;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.reports-container table tbody td a:hover {
+  color: #d32c46;
+}
+
+/* Responsive Design */
+@media (max-width: 1208px) {
+  .reports-container {
+    margin-left: 0; /* Remove margin on smaller screens */
+    border-radius: 0; /* Remove border radius on smaller screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .reports-container {
+    padding: 20px; /* Reduce padding on smaller screens */
+    min-height: auto; /* Allow height to adjust based on content */
+  }
+
+  .reports-container h2 {
+    font-size: 1.75rem; /* Reduce font size for smaller screens */
+    margin-bottom: 20px;
+  }
+
+  .reports-container table {
+    font-size: 16px; /* Reduce font size for smaller screens */
+  }
+
+  .reports-container table thead th,
+  .reports-container table tbody td {
+    padding: 8px; /* Reduce padding for smaller screens */
+  }
+}
+
+@media (max-width: 460px) {
+  .reports-container table {
+    font-size: 14px; /* Further reduce font size for very small screens */
+  }
+
+  .reports-container table thead th,
+  .reports-container table tbody td {
+    padding: 6px; /* Further reduce padding for very small screens */
+  }
+}
+
+.download-btn {
+  background-color : #d32c46; /* Button background */
+  color: #ffffff; /* Text color */
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.3s ease-in-out;
+}
+
+.download-btn:hover {
+  background-color:blue; /* Darker shade on hover */
+}
+
+
+
+/* Backup component */
+.backup-container {
+  padding: 40px;
+  background: #e5e5e5;
+  border-top-left-radius: 50px;
+  border-bottom-left-radius: 50px;
+  margin-left: 120px; /* Ensure it doesn't overlap with the sidebar */
+  min-height: calc(112.5vh - 80px); /* Minimum height to fill the viewport */
+  overflow-y: auto; /* Add scroll if content overflows */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.backup-container h2 {
+  font-size: 2.3rem;
+  color: #d32c46;
+  margin-bottom: 30px;
+}
+
+.backup-info {
+  max-width: 800px;
+  margin-bottom: 30px;
+  text-align: left;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.backup-info p {
+  margin-bottom: 15px;
+}
+
+.backup-info strong {
+  color: #d32c46;
+}
+
+.button-group {
+  display: flex;
+  gap: 20px; /* Space between buttons */
+}
+
+.backup-button {
+  background-color: #d32c46; /* Button background */
+  color: #ffffff; /* Text color */
+  padding: 15px 30px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background 0.3s ease-in-out;
+}
+
+.backup-button:hover {
+  background-color: blue; /* Darker shade on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 1208px) {
+  .backup-container {
+    margin-left: 0; /* Remove margin on smaller screens */
+    border-radius: 0; /* Remove border radius on smaller screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .backup-container {
+    padding: 20px; /* Reduce padding on smaller screens */
+    min-height: auto; /* Allow height to adjust based on content */
+  }
+
+  .backup-container h2 {
+    font-size: 1.75rem; /* Reduce font size for smaller screens */
+    margin-bottom: 20px;
+  }
+
+  .backup-info {
+    font-size: 16px; /* Reduce font size for smaller screens */
+  }
+
+  .button-group {
+    flex-direction: column; /* Stack buttons vertically on smaller screens */
+    gap: 10px;
+  }
+
+  .backup-button {
+    padding: 12px 24px; /* Adjust button padding for smaller screens */
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 460px) {
+  .backup-info {
+    font-size: 14px; /* Further reduce font size for very small screens */
+  }
+
+  .backup-button {
+    padding: 10px 20px; /* Further reduce padding for very small screens */
+    font-size: 12px;
   }
 }
