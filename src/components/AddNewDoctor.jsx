@@ -11,14 +11,14 @@ const AddNewDoctor = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [dob, setDob] = useState("");
+  const [dob, setDob] = useState(""); // Stores DD/MM/YYYY format for UI
   const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [doctorDepartment, setDoctorDepartment] = useState("");
   const [doctorFees, setDoctorFees] = useState("");
-  const [joiningDate, setJoiningDate] = useState("");
-  const [resignationDate, setResignationDate] = useState("");
+  const [joiningDate, setJoiningDate] = useState(""); // Stores DD/MM/YYYY format for UI
+  const [resignationDate, setResignationDate] = useState(""); // Stores DD/MM/YYYY format for UI
   const [doctorAvailability, setDoctorAvailability] = useState([
     { day: "", timings: "" },
   ]);
@@ -39,6 +39,26 @@ const AddNewDoctor = () => {
     "ENT",
   ];
 
+  // Convert DD/MM/YYYY to YYYY-MM-DD for backend
+  const convertToISO = (dateString) => {
+    if (!dateString) return "";
+    const [day, month, year] = dateString.split("/");
+    return `${year}-${month}-${day}`; // Convert to YYYY-MM-DD
+  };
+
+  // Handle date input change and format as DD/MM/YYYY
+  const handleDateChange = (e, setDateFunction) => {
+    let input = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+    if (input.length > 8) input = input.slice(0, 8); // Restrict to 8 digits (DDMMYYYY)
+
+    // Format as DD/MM/YYYY
+    let formatted = input;
+    if (input.length > 2) formatted = `${input.slice(0, 2)}/${input.slice(2)}`;
+    if (input.length > 4) formatted = `${input.slice(0, 2)}/${input.slice(2, 4)}/${input.slice(4)}`;
+
+    setDateFunction(formatted);
+  };
+
   const handleAvatar = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
@@ -58,6 +78,10 @@ const AddNewDoctor = () => {
   const handleAddNewDoctor = async (e) => {
     e.preventDefault();
     try {
+      const isoDob = convertToISO(dob); // Convert DD/MM/YYYY to YYYY-MM-DD
+      const isoJoiningDate = convertToISO(joiningDate); // Convert DD/MM/YYYY to YYYY-MM-DD
+      const isoResignationDate = convertToISO(resignationDate); // Convert DD/MM/YYYY to YYYY-MM-DD
+
       const formData = new FormData();
       formData.append("firstName", firstName);
       formData.append("lastName", lastName);
@@ -65,12 +89,12 @@ const AddNewDoctor = () => {
       formData.append("phone", phone);
       formData.append("password", password);
       formData.append("confirmPassword", confirmPassword);
-      formData.append("dob", dob);
+      formData.append("dob", isoDob); // Send in YYYY-MM-DD format
       formData.append("gender", gender);
       formData.append("doctorDepartment", doctorDepartment);
       formData.append("doctorFees", doctorFees);
-      formData.append("joiningDate", joiningDate);
-      formData.append("resignationDate", resignationDate);
+      formData.append("joiningDate", isoJoiningDate); // Send in YYYY-MM-DD format
+      formData.append("resignationDate", isoResignationDate); // Send in YYYY-MM-DD format
       formData.append("doctorAvailability", JSON.stringify(doctorAvailability));
       formData.append("docAvatar", docAvatar);
 
@@ -79,7 +103,9 @@ const AddNewDoctor = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      toast.success(response.data.message);
+      toast.success(
+        `${response.data.message} | Registration ID: ${response.data.doctor._id}`,
+      );
       setIsAuthenticated(true);
       navigateTo("/");
 
@@ -161,10 +187,11 @@ const AddNewDoctor = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
               <input
-                type="date"
-                placeholder="Date of Birth"
+                type="text"
+                placeholder="Date of Birth (DD/MM/YYYY)"
                 value={dob}
-                onChange={(e) => setDob(e.target.value)}
+                onChange={(e) => handleDateChange(e, setDob)}
+                maxLength="10"
               />
               <select value={gender} onChange={(e) => setGender(e.target.value)}>
                 <option value="">Select Gender</option>
@@ -189,16 +216,18 @@ const AddNewDoctor = () => {
                 onChange={(e) => setDoctorFees(e.target.value)}
               />
               <input
-                type="date"
-                placeholder="Joining Date"
+                type="text"
+                placeholder="Joining Date (DD/MM/YYYY)"
                 value={joiningDate}
-                onChange={(e) => setJoiningDate(e.target.value)}
+                onChange={(e) => handleDateChange(e, setJoiningDate)}
+                maxLength="10"
               />
               <input
-                type="date"
-                placeholder="Resignation Date (Optional)"
+                type="text"
+                placeholder="Resignation Date (DD/MM/YYYY)"
                 value={resignationDate}
-                onChange={(e) => setResignationDate(e.target.value)}
+                onChange={(e) => handleDateChange(e, setResignationDate)}
+                maxLength="10"
               />
 
               {/* Availability Section */}
