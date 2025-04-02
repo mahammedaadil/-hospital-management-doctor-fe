@@ -9,6 +9,7 @@ const Doctors = () => {
   const { isAuthenticated } = useContext(Context);
   const [editingDoctorId, setEditingDoctorId] = useState(null);
   const [filterDepartment, setFilterDepartment] = useState("All");
+  const [filterStatus, setFilterStatus] = useState("All");
   const [updatedDoctorData, setUpdatedDoctorData] = useState({
     firstName: "",
     lastName: "",
@@ -35,13 +36,27 @@ const Doctors = () => {
     fetchDoctors();
   }, []);
 
-  const deleteDoctor = async (id) => {
+  const activateDoctor = async (id) => {
     try {
-      await axiosInstance.delete(`/user/doctor/${id}`);
-      toast.success("Doctor deleted successfully");
-      setDoctors(doctors.filter((doctor) => doctor._id !== id));
+      const { data } = await axiosInstance.put(`/user/doctor/activate/${id}`);
+      toast.success("Doctor activated successfully");
+      setDoctors(doctors.map(doctor => 
+        doctor._id === id ? { ...doctor, isActive: true } : doctor
+      ));
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete doctor");
+      toast.error(error.response?.data?.message || "Failed to activate doctor");
+    }
+  };
+
+  const deactivateDoctor = async (id) => {
+    try {
+      const { data } = await axiosInstance.put(`/user/doctor/deactivate/${id}`);
+      toast.success("Doctor deactivated successfully");
+      setDoctors(doctors.map(doctor => 
+        doctor._id === id ? { ...doctor, isActive: false } : doctor
+      ));
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to deactivate doctor");
     }
   };
 
@@ -103,13 +118,13 @@ const Doctors = () => {
     setUpdatedDoctorData((prevData) => ({ ...prevData, doctorAvailability: newAvailability }));
   };
 
-  const isTimeSlotConflicting = (day, timings) => {
-    return updatedDoctorData.doctorAvailability.some(slot => slot.day === day && slot.timings === timings);
-  };
-
-  const filteredDoctors = filterDepartment === "All"
-    ? doctors
-    : doctors.filter((doc) => doc.doctorDepartment === filterDepartment);
+  const filteredDoctors = doctors.filter(doctor => {
+    const departmentMatch = filterDepartment === "All" || doctor.doctorDepartment === filterDepartment;
+    const statusMatch = filterStatus === "All" || 
+                       (filterStatus === "Active" && doctor.isActive) || 
+                       (filterStatus === "Inactive" && !doctor.isActive);
+    return departmentMatch && statusMatch;
+  });
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
@@ -130,16 +145,30 @@ const Doctors = () => {
             <option key={idx} value={dept}>{dept}</option>
           ))}
         </select>
+
+        <label htmlFor="statusFilter">Filter by Status:</label>
+        <select
+          id="statusFilter"
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+        >
+          <option value="All">All Statuses</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
       </div>
       <div className="banner">
         {filteredDoctors && filteredDoctors.length > 0 ? (
           filteredDoctors.map((element) => (
-            <div className="doctor-card" key={element._id}>
+            <div className={`doctor-card ${!element.isActive ? 'inactive' : ''}`} key={element._id}>
               <img
                 src={element.docAvatar?.url || "/default-avatar.png"}
                 alt="doctor avatar"
               />
               <h4>{`${element.firstName} ${element.lastName}`.toUpperCase()}</h4>
+              <div className="status-badge">
+                {element.isActive ? 'Active' : 'Inactive'}
+              </div>
               <div className="doctor-details">
                 <p>Email: <span>{element.email}</span></p>
                 <p>Phone: <span>{element.phone}</span></p>
@@ -164,7 +193,11 @@ const Doctors = () => {
               </div>
               <div className="actions">
                 <button className="btn btn-update" onClick={() => startEditing(element)}>Update</button>
-                <button className="btn btn-delete" onClick={() => deleteDoctor(element._id)}>Delete</button>
+                {element.isActive ? (
+                  <button className="btn btn-deactivate" onClick={() => deactivateDoctor(element._id)}>Deactivate</button>
+                ) : (
+                  <button className="btn btn-activate" onClick={() => activateDoctor(element._id)}>Activate</button>
+                )}
               </div>
             </div>
           ))
@@ -226,15 +259,13 @@ const Doctors = () => {
                     ))}
                   </select>
 
-                  
-                <button type="button" className="remove-availability-btn" onClick={() => removeAvailabilitySlot(index)}>
-                Remove
-                </button>
-                  
+                  <button type="button" className="remove-availability-btn" onClick={() => removeAvailabilitySlot(index)}>
+                    Remove
+                  </button>
                 </div>
               ))}
               <button type="button" className="add-availability-btn" onClick={addAvailabilitySlot}>
-               Add Availability Slot
+                Add Availability Slot
               </button>
 
               <button type="submit" className="update-button">Update Doctor</button>
